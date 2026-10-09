@@ -98,16 +98,7 @@ VITE_API_URL=http://localhost:5000
 
 ---
 
-## docs/ Directory
 
-| Folder           | Contents                                                  |
-|------------------|-----------------------------------------------------------|
-| `status-reports/`| Development status reports, test results, implementation notes |
-| `sql-migrations/`| SQL scripts for database schema setup and migration fixes  |
-| `tests/`         | Backend, chatbot, and integration test scripts             |
-| `debug-scripts/` | Diagnostic and monitoring utilities                        |
-
----
 
 ## Features
 
