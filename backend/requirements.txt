@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+scikit-learn
+xgboost
+joblib
+pandas
+numpy
+python-dotenv
+psycopg2-binary
+supabase
+groq
+httpx
+pymongo
+dnspython
+PyJWT
+argon2-cffi

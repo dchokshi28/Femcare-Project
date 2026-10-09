@@ -1,0 +1,215 @@
+/* EmergencyButton.css */
+
+/* Floating Action Button (FAB) */
+.emergency-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 8px 25px rgba(225, 29, 72, 0.35);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  animation: pulse-soft 2.5s infinite;
+}
+
+.emergency-fab:hover {
+  transform: scale(1.1) translateY(-4px);
+  box-shadow: 0 12px 30px rgba(225, 29, 72, 0.45);
+}
+
+.emergency-fab:hover::after {
+  content: "Emergency Alert";
+  position: absolute;
+  right: 76px;
+  background: #1F2937;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes pulse-soft {
+  0% { box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(251, 113, 133, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(251, 113, 133, 0); }
+}
+
+/* Modal Styling */
+.emergency-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fade-in 0.3s ease-out;
+}
+
+.emergency-modal {
+  background: white;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 2rem;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  animation: slide-up 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.emergency-modal h2 {
+  color: #FB7185;
+  font-weight: 800;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.emergency-modal p {
+  color: #6B7280;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Form Styling in Modal */
+.emergency-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.emergency-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.emergency-field label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 0.5rem;
+}
+
+.emergency-field input,
+.emergency-field textarea {
+  background: #F8F6FB;
+  border: 2px solid #F3F4F6;
+  border-radius: 1rem;
+  padding: 0.875rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.emergency-field input:focus,
+.emergency-field textarea:focus {
+  border-color: #FB7185;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.1);
+}
+
+.emergency-actions-list-minimal {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.info-text {
+  font-size: 0.75rem;
+  color: #A78BFA;
+  font-weight: 600;
+}
+
+.emergency-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.emergency-confirm-btn {
+  background: #FB7185;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.emergency-confirm-btn:hover {
+  background: #f43f5e;
+  transform: translateY(-2px);
+}
+
+.emergency-cancel-btn {
+  background: #F3F4F6;
+  color: #4B5563;
+  border: none;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.emergency-cancel-btn:hover {
+  background: #E5E7EB;
+}
+
+/* Toast Styling */
+.emergency-toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 3000;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: toast-in-out 3s forwards;
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-up { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes toast-in-out {
+  0% { transform: translate(-50%, 20px); opacity: 0; }
+  10% { transform: translate(-50%, 0); opacity: 1; }
+  90% { transform: translate(-50%, 0); opacity: 1; }
+  100% { transform: translate(-50%, -20px); opacity: 0; }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 640px) {
+  .emergency-fab {
+    width: 72px;
+    height: 72px;
+    bottom: 20px;
+    right: 20px;
+  }
+}

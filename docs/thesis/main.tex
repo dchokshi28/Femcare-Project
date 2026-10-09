@@ -1,0 +1,235 @@
+\documentclass[11pt,a4paper,draft]{report}
+
+% =========================================================
+% PACKAGES
+% =========================================================
+
+\usepackage{times}
+\usepackage{graphicx}
+
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+\usepackage{amsmath}
+\usepackage{longtable}
+\usepackage{acro}
+\usepackage[utf8]{inputenc}
+
+%\usepackage[acronym]{glossaries}
+%\usepackage[toc]{glossaries}
+%\usepackage[refpage]{nomencl}
+
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{txfonts}
+\usepackage{mathdots}
+\usepackage{rotating}
+\usepackage{array}
+\usepackage[classicReIm]{kpfonts}
+
+%\usepackage[dvips]{graphicx}
+
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png,.PNG}
+
+% =========================================================
+% HYPERREF
+% =========================================================
+
+\PassOptionsToPackage{hyphens}{url}
+
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    citecolor={red}
+}
+
+\urlstyle{same}
+
+% =========================================================
+% MATHEMATICS / REFERENCES
+% =========================================================
+
+\usepackage{mathtools}
+\usepackage[superscript]{cite}
+
+% =========================================================
+% PAGE FORMAT
+% =========================================================
+
+\usepackage[
+    top=2cm,
+    bottom=2cm,
+    left=2.5cm,
+    right=2cm
+]{geometry}
+
+\usepackage[compact]{titlesec}
+
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{fontenc}
+\usepackage{microtype}
+
+% =========================================================
+% TABLES
+% =========================================================
+
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[table,xcdraw]{xcolor}
+
+\setlength{\arrayrulewidth}{0.4mm}
+\setlength{\tabcolsep}{18pt}
+\renewcommand{\arraystretch}{1.5}
+
+% =========================================================
+% WATERMARK
+% =========================================================
+
+% Temporarily disabled because it was causing
+% graphicx package option clash.
+%
+% \usepackage[printwatermark]{xwatermark}
+% \usepackage{transparent}
+
+% =========================================================
+% ALGORITHMS
+% =========================================================
+
+\usepackage{algorithm2e}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+% =========================================================
+% PDF / SYMBOLS
+% =========================================================
+
+\usepackage[final]{pdfpages}
+
+% Temporarily disabled to avoid possible font conflicts.
+% Uncomment later if your document specifically needs them.
+%
+% \usepackage{MnSymbol,wasysym}
+
+% =========================================================
+% TIKZ
+% =========================================================
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc}
+
+% =========================================================
+% HEADER / FOOTER
+% =========================================================
+
+\pagestyle{fancy}
+
+\fancyhf{}
+
+\fancyhead[R]{\itshape\leftmark}
+
+\fancyfoot[C]{\thepage}
+
+\renewcommand{\headrulewidth}{0pt}
+
+% =========================================================
+% FONT / LINE SPACING
+% =========================================================
+
+\usepackage{mathptmx}
+
+\linespread{1.5}
+
+% =========================================================
+% DOCUMENT
+% =========================================================
+
+\begin{document}
+
+% ---------------------------------------------------------
+% FRONT MATTER
+% ---------------------------------------------------------
+
+\renewcommand{\thepage}{\roman{page}}
+
+\include{cover.tex}
+
+%\include{Chap-3}
+
+\include{Certificate.tex}
+
+\include{Ack}
+
+\include{Abstract}
+
+\include{toc}
+
+% ---------------------------------------------------------
+% MAIN MATTER
+% ---------------------------------------------------------
+
+\pagenumbering{arabic}
+
+% Chapter header
+\renewcommand{\chaptermark}[1]{%
+    \markboth{\chaptername\ \thechapter\ -\ #1}{}%
+}
+
+\pagestyle{fancy}
+
+\renewcommand{\headrulewidth}{2pt}
+
+\renewcommand{\footrulewidth}{1pt}
+
+% ---------------------------------------------------------
+% CHAPTERS
+% ---------------------------------------------------------
+
+\include{Chap-1-Intro}
+
+\include{chap-2-Lit}
+
+\include{Chap-3-SRS}
+
+\include{chap-4-Design}
+
+\include{Chap-5-Methodology}
+
+\include{Chap-6-imple}
+
+\include{Chap-7-Concl}
+
+\include{Chap-8-Futur}
+
+% ---------------------------------------------------------
+% BIBLIOGRAPHY
+% ---------------------------------------------------------
+
+\include{Bibilio}
+
+% ---------------------------------------------------------
+% OLD / UNUSED
+% ---------------------------------------------------------
+
+%\include{cover}
+%\include{Titlepages}
+%\include{Certificate.tex}
+
+%\pagenumbering{arabic}
+
+%\pagestyle{\chaptermark}{\markboth{\chaptername \\thechapter \ -\ #1}{}}
+
+%\renewcommand{\headrulewidth}{2pt}
+%\renewcommand{\footrulewidth}{1pt}
+
+% ---------------------------------------------------------
+
+\end{document}

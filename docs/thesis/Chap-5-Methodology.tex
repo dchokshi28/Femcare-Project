@@ -1,0 +1,270 @@
+% ============================================================
+% CHAPTER 5 -- METHODOLOGY (SYSTEM IMPLEMENTATION)
+% FEMCARE: An AI-Powered Women's Reproductive Health Platform
+% ============================================================
+
+\chapter{Methodology}\doublespacing
+\label{chap:implementation}
+
+% ------------------------------------------------------------
+\section{Introduction}
+\label{sec:impl-intro}
+
+This chapter presents the methodology adopted for the development of the FemCare system, an AI-driven platform for women’s reproductive health monitoring and risk awareness. The methodology describes the complete process followed for data preparation, preprocessing, feature construction, machine learning model development, model evaluation, prediction generation, and integration of the trained models with the application.
+
+The machine learning component of FemCare consists of two independent prediction tasks. The first task is a binary classification problem for assessing the risk of PMOS, for which an XGBoost classifier is employed. The second task is a regression problem for predicting the length of the user's next menstrual cycle, for which an XGBoost regressor is used. Both models are trained separately because they have different target variables and prediction objectives.
+
+The overall methodology follows the sequence:
+
+Dataset Collection $\rightarrow$ Data Inspection $\rightarrow$ Data Preprocessing $\rightarrow$ Feature Preparation $\rightarrow$ Data Splitting $\rightarrow$ XGBoost Model Training $\rightarrow$ Prediction $\rightarrow$ Performance Evaluation $\rightarrow$ Model Saving $\rightarrow$ Application Integration
+
+The PMOS model uses pmos as its target variable, while the menstrual-cycle model uses Next\_Cycle\_Length as its target variable. The trained models are subsequently incorporated into the FemCare backend to generate predictions from user-provided information.
+
+% ------------------------------------------------------------
+\section{Overall System Approach}
+\label{system approach}
+The FemCare system follows a data-driven and modular approach in which user information is processed through dedicated prediction pipelines. The methodology separates the PMOS risk-assessment task from the menstrual-cycle prediction task so that each model can be developed, evaluated, and deployed according to the requirements of its respective prediction problem.
+
+The overall system methodology consists of the following major stages:
+
+\begin{itemize}
+    \item \textbf{Data Collection:} Relevant reproductive-health and menstrual-cycle datasets are prepared for model development.
+    \item \textbf{Data Inspection:} The datasets are examined for their dimensions, data types, target distributions, missing values, and feature characteristics.
+    \item \textbf{Data Pre-processing:} Unnecessary attributes are removed, input variables are converted into suitable numerical or categorical representations, and missing values are handled.
+    \item \textbf{Feature Preparation:}  Relevant physiological, menstrual, symptom, temporal, and historical-cycle attributes are prepared for model training.
+    \item \textbf{Data Splitting:} Appropriate training and testing strategies are applied. Stratified splitting is used for PCOS classification, while user-level splitting is used for menstrual-cycle prediction.
+    \item \textbf{Model Development:} XGBoost models are trained independently for classification and regression.
+    \item \textbf{Prediction:} The trained models generate PCOS class and probability predictions or next-cycle length predictions.
+    \item \textbf{Evaluation:} Appropriate classification and regression metrics are calculated to assess model performance.
+    \item \textbf{Model Serialization:} The trained models and required pre-processing components are saved for application deployment.
+    \item \textbf{Application Integration:} The saved models are connected to the FastAPI backend and accessed by the FemCare frontend through REST APIs. 
+\end{itemize}
+This approach ensures that the same preprocessing and feature arrangement used during model development can be maintained when new user data is processed by the deployed application.
+
+\section{Data Preprocessing}
+\label{sec:datapre}
+The machine learning component of FemCare uses separate datasets for PCOS risk assessment and menstrual-cycle prediction.
+
+\subsection{PMOS Dataset}
+The PMOS prediction experiment uses a dataset containing 10,000 records and 48 columns. The dataset contains reproductive-health-related variables covering menstrual, hormonal, physical-health, and other relevant characteristics. The dataset was prepared using information derived from clinical literature and a feature set based on Kerala clinical data. The data used for experimentation is organized in the Final\_Dataset worksheet.
+
+The target variable for the classification task is PMOS. The value of this variable represents the binary class to be predicted by the XGBoost classifier.
+
+Before model training, the dataset was inspected to determine:
+\begin{itemize}
+    \item Number of observations
+    \item Number of variables
+    \item Feature names
+    \item Data types
+    \item Missing-value distribution
+    \item Target-variable distribution
+\end{itemize}
+The following attributes were excluded from the input feature matrix:
+\begin{itemize}
+    \item patient\_id
+    \item blood\_group\_label
+    \item cycle\_regularity\_label
+    \item bmi\_category
+    \item age\_group
+    \item PMOS
+\end{itemize}
+he pmos attribute was excluded from the input features because it represents the prediction target.
+
+Therefore, if $D$ represents the original PMOS dataset, the input feature matrix can be represented as:
+\begin{equation}
+X = D - \{ \text{patient\_id}, \text{blood\_group\_label}, \text{cycle\_regularity\_label}, \text{bmi\_category}, \text{age\_group}, \text{pcos} \}
+\end{equation}
+and the target vector is:
+$y = \text{pcos}$
+
+The project methodology documentation confirms that the PCOS dataset contains 10,000 records and 48 columns and that the pcos attribute is used as the classification target.
+
+\subsection{Menstrual-Cycle Dataset}
+A separate longitudinal menstrual-cycle dataset is used for next-cycle prediction. The dataset contains menstrual records organized on a per-user basis. Each record contains information related to an individual's menstrual history, cycle characteristics, symptoms, and temporal information.
+
+The cycle dataset includes attributes such as:
+\begin{itemize}
+    \item User ID
+    \item Cycle Number
+    \item Period Start Date
+    \item Period End Date
+    \item Cycle Length
+    \item Period Duration
+    \item Flow
+    \item Cramps
+    \item Headache
+    \item Bloating
+\end{itemize}
+Additional historical cycle features are constructed from previous menstrual cycles.
+
+The target variable is Next\_Cycle\_Length, which represents the length of the following menstrual cycle. The target is generated by arranging the records chronologically for each user and shifting the current cycle length by one period.
+
+Thus:
+\begin{equation}
+\text{NextCycleLength}_{t} = \text{CycleLength}_{t+1}
+\end{equation}
+Records for which the current or future cycle length is unavailable or invalid are excluded from the modeling dataset.
+
+\section{Data Pre-Processing}
+\label{sec:dataPre}
+Data preprocessing is performed before model training to ensure that the input data is consistent, valid, and compatible with the machine learning algorithms.
+
+\subsubsection{PCOS Data Pre-Processing}
+For the PCOS model, unnecessary identifiers and redundant categorical-label columns are removed before training. The remaining input features are converted into numerical form.
+
+Each feature is processed using numerical conversion. If a value cannot be converted into a valid numerical representation, it is treated as a missing value.
+
+Although the original PCOS dataset used for experimentation contains no missing values, a median imputer is retained as part of the prediction pipeline. This ensures that missing values originating from future user input can be handled consistently during application-level prediction.
+
+The median-imputation process can be represented as:
+\begin{equation}
+x'_i = 
+\begin{cases} 
+x_i, & \text{if } x_i \text{ is available} \\ 
+\text{median}(X_j), & \text{if } x_i \text{ is missing} 
+\end{cases}
+\end{equation}
+where $X_j$ represents the corresponding feature.
+
+After preprocessing, the dataset is divided into training and testing subsets using an 80:20 ratio. A fixed random state of 42 is used to maintain reproducibility, and stratification based on the PCOS target is applied to preserve the class distribution in the two subsets. The resulting test set contains 2,000 records, consisting of 1,340 No-PCOS cases and 660 PCOS cases.
+
+\subsubsection{Menstrual-Cycle Data Preprocessing}
+
+The menstrual-cycle dataset requires additional temporal preprocessing because the prediction task is based on sequential menstrual records.
+
+First, records are organized according to User\_ID and Period\_Start\_Date so that each user's menstrual history is maintained in chronological order. The next-cycle target is then created by shifting the cycle length forward by one record within each user group.
+
+Historical features are also generated using the previous three cycle lengths:
+\[
+\text{PreviousCycle}_1, \quad \text{PreviousCycle}_2, \quad \text{PreviousCycle}_3
+\]
+
+The average of the available previous cycles is calculated as:
+\begin{equation}
+    \text{PreviousCycleAverage} = \frac{C_1 + C_2 + C_3}{3}
+\end{equation}
+
+when all three values are available.
+The standard deviation of previous cycle lengths is also calculated to represent recent cycle-length variability.
+
+For numerical variables, missing values are handled using median imputation. For categorical variables, missing values are replaced using the most frequent category, after which categorical variables are transformed using one-hot encoding. Unknown categories encountered during prediction are ignored so that new user inputs do not cause preprocessing failures.
+
+A GroupShuffleSplit strategy is used with User\_ID as the grouping variable. The test size is 20\% and the random state is 42. Consequently, records belonging to the same user are retained within a single partition rather than being distributed between training and testing sets. This is important for longitudinal data because it reduces the possibility of the same user's historical records appearing in both training and testing data.
+
+
+\section{Feature Selection}
+\label{sec:featselec}
+
+Feature selection is performed separately for the PCOS classification and menstrual-cycle prediction models.
+
+For PCOS prediction, identifier and redundant categorical-label attributes such as patient\_id, blood\_group\_label, cycle\_regularity\_label, bmi\_category, and age\_group are excluded. The remaining health-related variables are used as input features. XGBoost feature-importance analysis is then used to identify the variables contributing most to the model predictions. The most important features include follicle number on the right, total follicle count, follicle number on the left, blood glucose, cycle regularity, AMH, LH, and the LH/FSH ratio. \cite{zad2024} These importance values represent model-level contribution and do not indicate causality.
+
+For menstrual-cycle prediction, the features include current cycle information, symptoms, temporal attributes, and historical cycle information. Three previous cycle lengths, their average, and standard deviation are included to capture recent cycle patterns and variability. Date-related features such as start month, start day, and start weekday are also derived from the period start date.
+
+\section{Machine Learning Model}
+\label{sec:MLmodel}
+FemCare uses two independent XGBoost models for its prediction tasks. An XGBClassifier is used for PCOS risk classification, while an XGBRegressor is used for menstrual-cycle length prediction.
+
+The PCOS model predicts a binary output using pcos as the target variable, whereas the cycle model predicts the continuous Next\_Cycle\_Length value. Both models are trained independently because the two tasks require different prediction objectives and evaluation procedures.
+
+\subsection{XGBoost Algorithm}
+XGBoost (Extreme Gradient Boosting) is an ensemble learning algorithm based on decision trees. It builds trees sequentially, with each new tree attempting to reduce the errors made by the previous trees. \cite{ahmed2023}
+
+For PMOS classification, the model uses the following configuration:
+
+\renewcommand{\arraystretch}{1.4} % Adds clean padding to rows
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Parameter} & \textbf{Value} \\ \hline
+Number of estimators & 500 \\ \hline
+Maximum depth & 5 \\ \hline
+Learning rate & 0.03 \\ \hline
+Subsample & 0.85 \\ \hline
+Column sample by tree & 0.85 \\ \hline
+Minimum child weight & 1 \\ \hline
+Objective & \texttt{binary:logistic} \\ \hline
+Evaluation metric & \texttt{logloss} \\ \hline
+Random state & 42 \\ \hline
+\end{tabular}
+\caption{XGBoost Model Hyperparameters}
+\label{tab:hyperparameters}
+\end{table}
+
+For menstrual-cycle prediction, the XGBoost regressor uses 500 estimators, a maximum depth of 5, a learning rate of 0.03, 0.85 subsampling, 0.85 feature sampling, and reg:squarederror as the regression objective.
+
+The PCOS classifier produces both a predicted class and its corresponding prediction probability, while the regression model produces the estimated length of the next menstrual cycle.
+
+\section{Evaluation Metrics}
+Different evaluation metrics are used for the two prediction tasks.
+
+\textbf{PCOS Classification}
+The PCOS model is evaluated using:
+\begin{itemize}
+    \item Accuracy
+    \item Precision
+    \item Recall
+    \item F1-score
+    \item ROC-AUC
+    \item Confusion Matrix
+    \item Five-fold Stratified Cross-Validation
+\end{itemize}
+
+The final PCOS model achieved 99.85\% accuracy, 99.85\% precision, 99.70\% recall, 99.77\% F1-score, and 1.0000 ROC-AUC. The five-fold cross-validation accuracy was 99.93\% ± 0.07\%.
+
+\textbf{Menstrual-Cycle Prediction}
+
+The cycle prediction model is evaluated using:
+\begin{itemize}
+    \item Mean Absolute Error (MAE)
+    \item Root Mean Squared Error (RMSE)
+$R^2$
+    \item Prediction accuracy within ±2 days
+\end{itemize}
+
+The final model achieved an MAE of 1.89 days, RMSE of 2.29 days, $R^2$ of 0.5274, and 57.68\% of predictions within ±2 days.
+
+
+% ------------------------------------------------------------
+\section{Advantages of Methodology}
+\label{sec:AdvMetho}
+The methodology provides the following advantages:
+\begin{itemize}
+    \item \textbf{Separate prediction models:} Classification and regression tasks are handled independently.
+    \item \textbf{Reproducibility:}Fixed random states are used during data splitting..
+    \item \textbf{Appropriate data splitting:}Stratification is used for PCOS classification, while user-level splitting is used for cycle prediction.
+    \item \textbf{Consistent preprocessing:}The same preprocessing components are reused during deployment.
+    \item \textbf{Feature analysis:}XGBoost feature importance provides information about influential input variables.
+    \item \textbf{Task-specific evaluation:}Different metrics are used according to the prediction problem.
+    \item \textbf{Application integration:}The trained models are directly integrated with the FastAPI backend.
+\end{itemize}
+
+\section{Limitations}
+The methodology has the following limitations:
+\begin{itemize}
+    \item Model performance depends on the datasets used for training and evaluation.
+    \item External validation using independent datasets is still required.
+    \item Prediction quality depends on the accuracy and completeness of user-provided information.
+    \item Menstrual-cycle length naturally varies between individuals and between cycles.
+    \item Feature-importance values represent model contribution and should not be interpreted as causal medical relationships.
+    \item The current system requires further clinical validation before potential clinical deployment. \cite{pi2025}
+    \item Privacy and security must be carefully maintained because the system handles sensitive reproductive-health information. \cite{kotz2016}
+\end{itemize}
+
+
+\section{Conclusion}
+\label{sec:Concl}
+The methodology of FemCare provides a structured machine learning pipeline covering data preparation, preprocessing, feature selection, model training, evaluation, and application integration. Two XGBoost models are used: an XGBoost classifier for PCOS risk assessment and an XGBoost regressor for menstrual-cycle length prediction.
+
+The PCOS model uses stratified classification methodology, while the cycle model incorporates historical menstrual information and user-level data separation. The trained models are integrated with the FastAPI backend to generate predictions from new user inputs and present the results through the FemCare application.
+
+Overall, the methodology provides the technical foundation for the FemCare system while recognizing the need for further external validation, clinical evaluation, and secure deployment.
+
+
+
+
+
+
+
+

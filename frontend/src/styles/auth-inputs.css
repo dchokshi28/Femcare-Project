@@ -1,0 +1,25 @@
+.auth-form-input {
+  background-color: #ffffff !important;
+  color: #1a1f2d !important;
+  color-scheme: light;
+}
+
+.auth-form-input:-webkit-autofill,
+.auth-form-input:-webkit-autofill:hover,
+.auth-form-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #1a1f2d !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  caret-color: #1a1f2d;
+}
+
+.auth-form-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1a1f2d !important;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow:
+    0 0 0 1000px #ffffff inset,
+    var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000),
+    var(--tw-shadow, 0 0 #0000) !important;
+  caret-color: #1a1f2d;
+}
