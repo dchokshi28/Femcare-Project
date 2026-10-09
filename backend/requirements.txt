@@ -10,7 +10,7 @@ psycopg2-binary
 supabase
 groq
 httpx
-pymongo
+pymongo>=4.14,<5.0
 dnspython
 PyJWT
 argon2-cffi
