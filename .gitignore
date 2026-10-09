@@ -1,57 +1,89 @@
+# =========================
 # Python
+# =========================
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
 *.so
-.Python
 
 # Virtual environments
+.venv/
 venv/
 env/
 ENV/
 
-# Packaging
+# Python packaging
 *.egg-info/
-
 dist/
 build/
-.vite/
 
+# Python testing and type checking
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# =========================
 # Environment variables
+# =========================
 .env
-.env.local
+.env.*
+!.env.example
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# ML models used by the health prediction features
-# *.pkl
-# *.h5
-# *.model
-
-# Firebase
-firebase-credentials.json
-
-# Node
+# =========================
+# Node.js / React / Vite
+# =========================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+pnpm-debug.log*
+dist/
+build/
+.vite/
 
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# =========================
+# Database files
+# =========================
+*.db
+*.sqlite
+*.sqlite3
 
-# OS
-.DS_Store
-Thumbs.db
-
+# =========================
 # Logs
+# =========================
 *.log
 logs/
+
+# =========================
+# IDEs
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# Operating system
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Temporary files
+# =========================
+*.swp
+*.swo
+*.tmp
+*.bak
+
+# =========================
+# Credentials
+# =========================
+firebase-credentials.json
+
+# =========================
+# ML models
+# =========================
+# Keep required model files available to the deployed backend.
+# Add model-specific ignore rules only if the models are stored elsewhere.
