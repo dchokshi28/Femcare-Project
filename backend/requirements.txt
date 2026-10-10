@@ -13,7 +13,7 @@ pydantic==2.11.5
 # --- Machine learning ---
 # IMPORTANT: both model artifacts were saved with xgboost 3.4.1.
 # Do NOT downgrade below 3.x — older versions cannot load these model files.
-xgboost==3.4.1
+xgboost==3.1.1
 scikit-learn==1.6.1
 numpy==1.26.4
 pandas==2.2.3
