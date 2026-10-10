@@ -1,0 +1,75 @@
+% ============================================================
+% CHAPTER 1 -- INTRODUCTION
+% FEMCARE: An AI-Powered Women's Reproductive Health Platform
+% ============================================================
+
+\chapter{Introduction}\doublespacing
+\label{chap:introduction}
+
+\section{Background}
+\label{sec:background}
+
+Women's reproductive health conditions -- including Polycystic Ovary Syndrome (PCOS), irregular menstrual cycles, and related hormonal disorders -- are prevalent yet frequently identified late due to limited health awareness and fragmented access to specialist care. Existing digital tools allow basic period logging but provide no structured risk screening, no domain-specific health guidance, and no integration with local healthcare providers. \cite{epstein2017}\cite{ahmed2023}
+
+Advances in machine learning and large language models (LLMs) have made it practical to build web-based platforms that offer clinical risk screening from user-reported data and intelligent, scoped health assistance. \cite{zad2024}\cite{maity2025} Deploying such a platform as a web application makes it accessible without installation, which is particularly relevant for users in semi-urban regions such as Vadodara, Gujarat, where specialist gynaecological services may not be immediately accessible.
+
+% ------------------------------------------------------------
+\section{Problem Statement}
+\label{sec:problem}
+
+No unified digital platform currently provides women with cycle tracking, structured PCOS risk assessment, topic-restricted AI health guidance, and local provider booking in a single authenticated application. \cite{epstein2017}\cite{kim2024} Users must rely on multiple disconnected tools, receive no risk indication from their logged data, and have no digital means to locate or book local women's health consultations. Personal health data stored by lightweight apps often lacks database-level per-user isolation. \cite{kotz2016} FEMCARE is proposed to address these gaps.
+
+% ------------------------------------------------------------
+\section{Proposed Solution}
+\label{sec:solution}
+
+FEMCARE is a full-stack web application providing an integrated platform for women's reproductive health monitoring, PCOS risk assessment, AI-assisted health guidance, and healthcare provider booking. The major implemented components are:
+
+\begin{itemize}
+    \item \textbf{Menstrual Cycle Tracking:} Daily logging of flow, pain level, mood, and symptoms, persisted in a cloud PostgreSQL database.
+    \item \textbf{PCOS Risk Assessment:} An 18-feature guided assessment processed by a pre-trained XGBoost classifier, returning a Low, Moderate, or High Risk classification with a confidence percentage.
+    \item \textbf{AI Health Assistant:} A Groq LLM-powered chatbot restricted to women's reproductive health topics, enriched with the authenticated user's real health data.
+    \item \textbf{Find Care and Booking:} An interactive map of 10 Vadodara providers with 16 daily time slots, database-level double-booking prevention, and email confirmation via the Resend API.
+    \item \textbf{Health Awareness:} Educational content for 8 reproductive health conditions with search and category filtering.
+    \item \textbf{Dashboard:} Real-time cycle phase display, logged health summary, and compact AI assistant.
+    \item \textbf{Security:} Supabase Authentication with JWT tokens; Row Level Security on all user data tables.
+\end{itemize}
+
+% ------------------------------------------------------------
+\section{Aim and Objectives}
+\label{sec:aim}
+
+The aim of this project is to design and implement a secure, AI-powered women's reproductive health web application that integrates cycle tracking, PCOS risk screening, health guidance, provider booking, and educational awareness in a single platform.
+
+The specific objectives are:
+
+\begin{enumerate}
+    \item Implement secure user authentication and automatic profile creation via a PostgreSQL trigger.
+    \item Develop a daily cycle logging module with cloud persistence and Dashboard synchronisation.
+    \item Build an 18-feature PCOS risk screening module using a pre-trained XGBoost classifier with a heuristic fallback.
+    \item Implement a topic-restricted AI health assistant using the Groq LLM API with user-context enrichment.
+    \item Develop a provider booking module with slot management and database-enforced double-booking prevention.
+    \item Send transactional appointment emails via the Resend API.
+    \item Create a searchable Women's Health Awareness module covering 8 conditions.
+    \item Enforce Row Level Security on all user data tables in Supabase PostgreSQL.
+\end{enumerate}
+
+% ------------------------------------------------------------
+\section{Scope}
+\label{sec:scope}
+
+FEMCARE is implemented as a web application covering cycle tracking, PCOS assessment, AI chat, Find Care and booking, health awareness, period history, and symptom history. The subscription plan page is a UI comparison only -- no payment integration is implemented. Wearable device integration, telemedicine, and a native mobile application are outside the current scope.
+
+% ------------------------------------------------------------
+\section{Organisation of the Thesis}
+\label{sec:organisation}
+
+\begin{itemize}
+    \item \textbf{Chapter 2 -- Literature Survey:} Reviews related work in women's digital health, PCOS detection, and AI health assistants.
+    \item \textbf{Chapter 3 -- SRS:} Defines functional and non-functional requirements.
+    \item \textbf{Chapter 4 -- System Design:} Covers architecture, database design, and data flows.
+    \item \textbf{Chapter 5 -- Methodology:} Describes the implementation of each component.
+    \item \textbf{Chapter 6 -- Implementation:} Presents functional test cases and observed results.
+    \item \textbf{Chapter 7 -- Conclusion:} Summarises the completed work.
+    \item \textbf{Chapter 8 -- Future Scope:} Proposes realistic enhancements.
+\end{itemize}

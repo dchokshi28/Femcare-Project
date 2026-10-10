@@ -1,0 +1,17 @@
+\thispagestyle{empty}
+\newpage
+\cleardoublepage\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}\index{Abstract}
+\begin{center}
+{\Large \bf Abstract}\\
+\end{center}
+\vspace{10pt}
+
+Women's reproductive health conditions, including Polycystic Ovary Syndrome (PCOS), irregular menstrual cycles, and related hormonal disorders, are prevalent yet frequently identified late due to limited health awareness and fragmented access to specialised care. Existing digital cycle-tracking tools enable basic period logging but do not offer structured risk screening, intelligent health guidance, or integration with local healthcare providers. This project presents FEMCARE, a full-stack web application that provides women with an integrated platform for reproductive health monitoring, PCOS risk assessment, AI-assisted health information, and healthcare appointment management.
+
+FEMCARE is built on a React and Vite frontend, a Python FastAPI backend, and a Supabase-managed PostgreSQL cloud database. The system implements an 18-feature PCOS risk screening module using a pre-trained XGBoost machine learning classifier that processes user-reported clinical indicators -- covering cycle regularity, physical symptoms, lifestyle factors, and optional hormonal values -- and returns a risk classification of Low, Moderate, or High Risk with a confidence percentage. A heuristic fallback ensures continued functionality when the model is unavailable. An AI health assistant, powered by the Groq large language model API, is constrained to women's reproductive health topics through a two-layer mechanism combining a Python keyword filter and an LLM system prompt, with responses enriched by the authenticated user's real cycle and symptom data. An appointment booking module displays ten women's healthcare providers in Vadodara on an interactive map, manages sixteen daily time slots per provider, and enforces double-booking prevention through a PostgreSQL partial unique index. Appointment confirmation and cancellation emails are delivered via the Resend API, and all user health data is protected by Row Level Security policies at the database level.
+
+FEMCARE demonstrates the practical integration of machine learning, large language model assistance, cloud database management, and modern web technologies within a secure, clinically responsible women's health platform. The system is intended as a screening and awareness tool and does not replace professional medical diagnosis.
+
+\vspace{10pt}
+\noindent\textbf{Keywords:} Women's Health, PCOS Detection, Menstrual Cycle Tracking, XGBoost, Large Language Model, FastAPI, Supabase, React, Appointment Booking, Row Level Security

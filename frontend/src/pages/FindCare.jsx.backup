@@ -1,0 +1,562 @@
+
+import { useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { Phone, MapPinned, CalendarDays, Clock3, CheckCircle2, Navigation, Building2, UserRoundCheck, Mail } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
+
+const customIcon = L.icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+const defaultCenters = [
+  {
+    id: 'vadodara-1',
+    type: 'Hospital',
+    name: 'BuildingRace Hospital',
+    specialty: 'Gynecology & Obstetrics',
+    address: 'Race Course Road, Near Natubhai Circle, Vadodara, Gujarat',
+    phone: '+91 265 278 0000',
+    latitude: 22.2987,
+    longitude: 73.1989,
+    availability: [
+      { date: '2026-09-02', slot: '09:30 AM' },
+      { date: '2026-09-03', slot: '11:00 AM' },
+      { date: '2026-09-05', slot: '02:15 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-2',
+    type: 'Hospital',
+    name: 'Jetalpur Road Multispecialty Hospital',
+    specialty: 'Advanced Multispecialty Care',
+    address: 'Jetalpur Road, behind Gujarat Kidney Hospital, Vadodara, Gujarat',
+    phone: '+91 265 246 1111',
+    latitude: 22.2868,
+    longitude: 73.1569,
+    availability: [
+      { date: '2026-09-02', slot: '10:45 AM' },
+      { date: '2026-09-04', slot: '12:30 PM' },
+      { date: '2026-09-06', slot: '04:00 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-3',
+    type: 'Hospital',
+    name: 'Sun-Pharma Hospital',
+    specialty: 'Women’s Care Unit & Gynae Services',
+    address: 'Sun-Pharma Atladra Road, opposite ICAI Bhavan, Vadodara, Gujarat',
+    phone: '+91 265 256 2222',
+    latitude: 22.2876,
+    longitude: 73.1521,
+    availability: [
+      { date: '2026-09-03', slot: '01:15 PM' },
+      { date: '2026-09-05', slot: '09:00 AM' },
+      { date: '2026-09-07', slot: '03:30 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-4',
+    type: 'Hospital',
+    name: 'Akshar Hospital',
+    specialty: 'High-risk Pregnancy & Laparoscopic Gynae Care',
+    address: 'Akshar Chowk, Old Padra Road, Vadodara, Gujarat',
+    phone: '+91 265 234 3333',
+    latitude: 22.3034,
+    longitude: 73.1775,
+    availability: [
+      { date: '2026-09-02', slot: '08:30 AM' },
+      { date: '2026-09-04', slot: '01:00 PM' },
+      { date: '2026-09-08', slot: '05:15 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-5',
+    type: 'Clinic',
+    name: 'Dr. Reshmi Banerjee Clinic',
+    specialty: 'Women’s Health, Maternity & Gynae',
+    address: 'GF 1,2 & FF 1,2,3, Syamal Sapphire, Gotri-Vasna Link Road, near Nilamber Circle, Vadodara, Gujarat',
+    phone: '+91 265 289 4444',
+    latitude: 22.3235,
+    longitude: 73.1649,
+    availability: [
+      { date: '2026-09-03', slot: '10:00 AM' },
+      { date: '2026-09-05', slot: '11:30 AM' },
+      { date: '2026-09-08', slot: '02:45 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-6',
+    type: 'Hospital',
+    name: 'Waghodia Hospital',
+    specialty: 'Obstetrics & Gynecology',
+    address: 'P.O. Limda, Taluka Waghodia, Vadodara, Gujarat',
+    phone: '+91 265 244 5555',
+    latitude: 22.3428,
+    longitude: 73.2723,
+    availability: [
+      { date: '2026-09-04', slot: '09:15 AM' },
+      { date: '2026-09-06', slot: '12:00 PM' },
+      { date: '2026-09-09', slot: '04:30 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-7',
+    type: 'Hospital',
+    name: 'Shree Krishna Hospital',
+    specialty: 'Gynecology & Obstetrics',
+    address: 'Near Akota, Vadodara, Gujarat',
+    phone: '+91 265 666 7000',
+    latitude: 22.2932,
+    longitude: 73.1945,
+    availability: [
+      { date: '2026-09-02', slot: '09:30 AM' },
+      { date: '2026-09-03', slot: '11:00 AM' },
+      { date: '2026-09-05', slot: '02:15 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-8',
+    type: 'Clinic',
+    name: 'Apex Women’s Clinic',
+    specialty: 'Reproductive Health & Fertility',
+    address: 'Alkapuri, Vadodara, Gujarat',
+    phone: '+91 265 234 1122',
+    latitude: 22.3089,
+    longitude: 73.181,
+    availability: [
+      { date: '2026-09-02', slot: '10:45 AM' },
+      { date: '2026-09-04', slot: '12:30 PM' },
+      { date: '2026-09-06', slot: '04:00 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-9',
+    type: 'Hospital',
+    name: 'Nandaben Hospital',
+    specialty: 'Women Health & Gynae',
+    address: 'Tarsali, Vadodara, Gujarat',
+    phone: '+91 265 256 3344',
+    latitude: 22.289,
+    longitude: 73.1838,
+    availability: [
+      { date: '2026-09-03', slot: '01:15 PM' },
+      { date: '2026-09-05', slot: '09:00 AM' },
+      { date: '2026-09-07', slot: '03:30 PM' },
+    ],
+  },
+  {
+    id: 'vadodara-10',
+    type: 'Clinic',
+    name: 'Dr. Meera Shah Gynae Clinic',
+    specialty: 'PCOS, Menstrual Health',
+    address: 'Manjalpur, Vadodara, Gujarat',
+    phone: '+91 265 654 8899',
+    latitude: 22.2696,
+    longitude: 73.1997,
+    availability: [
+      { date: '2026-09-02', slot: '08:30 AM' },
+      { date: '2026-09-04', slot: '01:00 PM' },
+      { date: '2026-09-08', slot: '05:15 PM' },
+    ],
+  },
+];
+
+const formatPhoneLink = (phone) => phone.replace(/\s+/g, '');
+
+const FindCare = () => {
+  const { user } = useAuth();
+  const [centers, setCenters] = useState(defaultCenters);
+  const [selected, setSelected] = useState(defaultCenters[0]);
+  const [bookingState, setBookingState] = useState({
+    hospital: '',
+    doctor: '',
+    date: '',
+    slot: '',
+    confirmed: false,
+  });
+
+  useEffect(() => {
+    const fetchCenters = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/clinics');
+        const data = await response.json();
+
+        if (data?.centers?.length) {
+          setCenters(data.centers);
+          setSelected(data.centers[0]);
+        }
+      } catch (error) {
+        console.error('Unable to load care centers:', error);
+      }
+    };
+
+    fetchCenters();
+  }, []);
+
+  const mapCenter = useMemo(() => [22.3072, 73.1812], []);
+
+  const saveBooking = async () => {
+    const payload = {
+      hospital: selected.name,
+      doctor: selected.specialty,
+      date: bookingState.date,
+      slot: bookingState.slot,
+    };
+
+    if (!payload.hospital || !payload.doctor || !payload.date || !payload.slot) {
+      alert('Please select both date and time slot');
+      return;
+    }
+
+    try {
+      // Get auth token from Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        alert('Please login to book an appointment');
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/book-appointment', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Booking failed');
+      }
+
+      const data = await response.json();
+      
+      setBookingState((prev) => ({ ...prev, confirmed: true }));
+      
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
+    } catch (error) {
+      console.error('Booking failed:', error);
+      alert('Booking failed: ' + error.message);
+    }
+  };
+
+  return (
+    <div className="mx-auto w-full max-w-[1800px] min-h-[calc(100vh-4.25rem)] bg-[#FFFDFC] px-2.5 sm:px-4 lg:px-6 py-3 text-[#17213D]">
+      <div className="space-y-4">
+
+        {/* Header Banner */}
+        <div className="rounded-[24px] border border-[#F5F0F7] bg-[#FFFDFC] p-4 sm:p-5 shadow-[0_12px_24px_rgba(23,33,61,0.03)]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-[#3B72AF]">
+                <MapPinned className="h-3.5 w-3.5" /> Vadodara Healthcare Network
+              </div>
+              <h1 className="mt-0.5 text-2xl sm:text-3xl font-black tracking-[-0.05em] text-[#17213D]">
+                Book Gynecology & Obstetrics Consultation
+              </h1>
+              <p className="text-[0.78rem] text-[#667085]">
+                Verified reproductive health specialists, clinics, and hospital care centers near you.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-[#F5F0F7] px-3 py-1.5 text-xs font-bold text-[#17213D] border border-[#F5F0F7]">
+                📍 Vadodara, Gujarat
+              </span>
+            </div>
+          </div>
+
+          {/* Map + Centers Grid */}
+          <div className="mt-4 grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+
+            {/* Interactive Leaflet Map */}
+            <div className="overflow-hidden rounded-[20px] border border-[#F5F0F7] bg-[#F5F0F7] p-1.5 shadow-sm">
+              <MapContainer
+                center={mapCenter}
+                zoom={12}
+                scrollWheelZoom
+                className="h-[380px] w-full overflow-hidden rounded-[16px]"
+              >
+                <TileLayer
+                  attribution="&copy; OpenStreetMap contributors"
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+
+                {centers.map((center) => (
+                  <Marker
+                    key={center.id}
+                    position={[center.latitude, center.longitude]}
+                    icon={customIcon}
+                  >
+                    <Popup>
+                      <div className="space-y-1 text-sm">
+                        <div className="font-bold text-[#17213D]">
+                          {center.name}
+                        </div>
+                        <div className="text-xs text-[#667085]">{center.specialty}</div>
+                        <div className="text-xs text-[#667085]">{center.address}</div>
+                        <a
+                          href={`tel:${formatPhoneLink(center.phone)}`}
+                          className="text-[#3B72AF] font-semibold text-xs underline"
+                        >
+                          {center.phone}
+                        </a>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </div>
+
+            {/* Care Centers List */}
+            <div className="space-y-2.5 max-h-[395px] overflow-y-auto pr-1">
+              {centers.map((center) => {
+                const isSelected = selected?.id === center.id;
+                return (
+                  <button
+                    key={center.id}
+                    onClick={() => {
+                      setSelected(center);
+                      setBookingState({ hospital: center.name, doctor: center.specialty, date: center.availability[0]?.date || '', slot: center.availability[0]?.slot || '', confirmed: false });
+                    }}
+                    className={`w-full rounded-[18px] border p-3.5 text-left transition-all duration-200 ${
+                      isSelected
+                        ? 'border-[#C8B7E8] bg-[#F5F0F7] ring-2 ring-[#C8B7E8]/40 shadow-sm'
+                        : 'border-[#F5F0F7] bg-[#FFFDFC] hover:border-[#C8B7E8]/60 hover:bg-[#F5F0F7]/40'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="text-[0.95rem] font-bold text-[#17213D] flex items-center gap-1.5">
+                          {center.name}
+                          <UserRoundCheck className="h-3.5 w-3.5 text-[#3B72AF]" />
+                        </div>
+                        <div className="mt-0.5 text-[0.72rem] font-medium text-[#667085]">
+                          {center.specialty}
+                        </div>
+                      </div>
+
+                      <span className="rounded-full bg-[#D9E7F4] px-2.5 py-0.5 text-[0.55rem] font-bold uppercase tracking-wider text-[#17213D]">
+                        {center.type}
+                      </span>
+                    </div>
+
+                    <div className="mt-2.5 space-y-1 text-[0.72rem] text-[#667085]">
+                      <div className="flex items-center gap-1.5">
+                        <Building2 className="h-3.5 w-3.5 text-[#17213D]" />
+                        <span className="truncate">{center.address}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1 text-[0.68rem]">
+                        <span className="flex items-center gap-1 text-[#17213D] font-semibold">
+                          <Phone className="h-3 w-3 text-[#3B72AF]" />
+                          {center.phone}
+                        </span>
+                        <span className="flex items-center gap-1 text-[#3B72AF] font-bold">
+                          <CalendarDays className="h-3 w-3" />
+                          Next: {center.availability[0]?.date} • {center.availability[0]?.slot}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+          </div>
+        </div>
+
+        {/* Booking Slot Selection Section */}
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+
+          {/* Interactive Slot Booking Card */}
+          <div className="rounded-[24px] border border-[#F5F0F7] bg-[#FFFDFC] p-5 shadow-[0_12px_24px_rgba(23,33,61,0.03)]">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F5F0F7] text-[#17213D]">
+                  <Clock3 className="h-5 w-5 text-[#3B72AF]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-[#17213D]">Select Appointment Date & Time</h3>
+                  <p className="text-[0.7rem] text-[#667085]">Instant booking confirmation with {selected?.name}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Hospital & Doctor Summary */}
+            <div className="mb-4 grid gap-2.5 sm:grid-cols-2 rounded-[16px] bg-[#F5F0F7] p-3 border border-[#F5F0F7]">
+              <div>
+                <span className="text-[0.58rem] font-bold uppercase tracking-wider text-[#667085]">Hospital / Clinic</span>
+                <div className="text-sm font-bold text-[#17213D]">{selected?.name}</div>
+              </div>
+              <div>
+                <span className="text-[0.58rem] font-bold uppercase tracking-wider text-[#667085]">Specialty Care</span>
+                <div className="text-sm font-bold text-[#17213D]">{selected?.specialty}</div>
+              </div>
+            </div>
+
+            {/* Interactive Date Selection Chips */}
+            <div className="mb-4 space-y-1.5">
+              <label className="text-[0.72rem] font-bold uppercase tracking-wider text-[#17213D]">
+                Step 1: Choose Date
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {Array.from(new Set(selected?.availability?.map((s) => s.date))).map((dateStr) => {
+                  const isSelectedDate = bookingState.date === dateStr;
+                  return (
+                    <button
+                      key={dateStr}
+                      type="button"
+                      onClick={() => setBookingState((prev) => ({ ...prev, date: dateStr, slot: '' }))}
+                      className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition-all ${
+                        isSelectedDate
+                          ? 'bg-[#17213D] text-[#FFFDFC] shadow-md scale-105'
+                          : 'bg-[#F5F0F7] text-[#17213D] hover:bg-[#F2C5CF]'
+                      }`}
+                    >
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      {dateStr}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Interactive Time Slot Chips */}
+            <div className="mb-5 space-y-1.5">
+              <label className="text-[0.72rem] font-bold uppercase tracking-wider text-[#17213D]">
+                Step 2: Choose Time Slot
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {selected?.availability
+                  ?.filter((slot) => !bookingState.date || slot.date === bookingState.date)
+                  .map((slot) => {
+                    const isSelectedSlot = bookingState.slot === slot.slot;
+                    return (
+                      <button
+                        key={`${slot.date}-${slot.slot}`}
+                        type="button"
+                        onClick={() => setBookingState((prev) => ({ ...prev, slot: slot.slot }))}
+                        className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition-all ${
+                          isSelectedSlot
+                            ? 'bg-[#E95A7A] text-[#FFFDFC] ring-2 ring-[#E95A7A]/40 shadow-md scale-105'
+                            : 'bg-[#F5F0F7] text-[#17213D] hover:bg-[#C8B7E8]'
+                        }`}
+                      >
+                        <Clock3 className="h-3.5 w-3.5" />
+                        {slot.slot}
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+
+            {/* Booking Actions */}
+            <div className="flex flex-wrap items-center gap-3 border-t border-[#F5F0F7] pt-4">
+              <button
+                onClick={saveBooking}
+                disabled={!bookingState.date || !bookingState.slot}
+                className={`rounded-full px-6 py-2.5 text-xs font-bold transition-all shadow-md ${
+                  bookingState.date && bookingState.slot
+                    ? 'bg-[#17213D] text-[#FFFDFC] hover:bg-[#17213D]/90 hover:-translate-y-0.5'
+                    : 'bg-[#667085]/30 text-[#667085] cursor-not-allowed'
+                }`}
+              >
+                Confirm Appointment Booking
+              </button>
+
+              <a
+                href={`tel:${formatPhoneLink(selected?.phone || '')}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#F5F0F7] bg-[#F5F0F7] px-4 py-2 text-xs font-semibold text-[#17213D] hover:bg-[#D9E7F4] transition-colors"
+              >
+                <Phone className="h-3.5 w-3.5 text-[#3B72AF]" />
+                Call Clinic
+              </a>
+
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  selected?.address || 'Vadodara'
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#F5F0F7] bg-[#F5F0F7] px-4 py-2 text-xs font-semibold text-[#17213D] hover:bg-[#D9E7F4] transition-colors"
+              >
+                <Navigation className="h-3.5 w-3.5 text-[#3B72AF]" />
+                Get Directions
+              </a>
+            </div>
+          </div>
+
+          {/* Booking Confirmation & Status Card */}
+          <div className="rounded-[24px] border border-[#F5F0F7] bg-[#FFFDFC] p-5 shadow-[0_12px_24px_rgba(23,33,61,0.03)] flex flex-col justify-between">
+            <div>
+              <div className="mb-3 flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F5F0F7] text-[#17213D]">
+                  <CheckCircle2 className="h-5 w-5 text-[#3B72AF]" />
+                </div>
+                <h3 className="text-base font-black text-[#17213D]">Booking Status</h3>
+              </div>
+
+              {bookingState.confirmed ? (
+                <div className="rounded-[18px] bg-[#F2C5CF]/60 p-4 border border-[#F2C5CF] space-y-2.5">
+                  <div className="flex items-center gap-2 text-sm font-black text-[#17213D]">
+                    <CheckCircle2 className="h-4 w-4 text-[#E95A7A]" />
+                    Appointment Confirmed!
+                  </div>
+                  <div className="text-xs font-semibold text-[#17213D]">
+                    {selected?.name} • {selected?.specialty}
+                  </div>
+                  <div className="text-[0.72rem] text-[#667085]">
+                    Date: <span className="font-bold text-[#17213D]">{bookingState.date}</span> at <span className="font-bold text-[#17213D]">{bookingState.slot}</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-[12px] bg-[#FFFDFC] p-2.5 text-[0.68rem] font-semibold text-[#3B72AF] border border-[#D9E7F4] shadow-sm">
+                    <Mail className="h-4 w-4 shrink-0 text-[#3B72AF]" />
+                    <span>Confirmation email sent to <strong>{user?.email || 'kashish@femcare.org'}</strong></span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2.5 text-xs text-[#667085]">
+                  <div className="flex items-center gap-2 rounded-[14px] bg-[#F5F0F7] p-2.5">
+                    <MapPinned className="h-4 w-4 text-[#3B72AF] shrink-0" />
+                    <span>Serving Vadodara, Gujarat clinics & hospitals</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 rounded-[14px] bg-[#F5F0F7] p-2.5">
+                    <Clock3 className="h-4 w-4 text-[#3B72AF] shrink-0" />
+                    <span>Real-time appointment slot verification</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 rounded-[14px] bg-[#F5F0F7] p-2.5">
+                    <Building2 className="h-4 w-4 text-[#3B72AF] shrink-0" />
+                    <span>Consultations for PCOS, fertility, & routine gynae care</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-[#F5F0F7] text-[0.65rem] text-[#667085] text-center">
+              FemCare Certified Medical Partner Network • Emergency hotline: 112
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default FindCare;

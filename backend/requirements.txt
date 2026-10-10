@@ -1,0 +1,36 @@
+# FemCare backend dependencies — pinned to versions verified working with the
+# trained model artifacts (pcos_xgboost_model.json and
+# cycle_prediction_xgboost_pipeline.pkl, both saved with XGBoost 3.4.1).
+#
+# Render runtime: Python 3.13 on Debian 12 (x86_64).
+# All packages below ship pre-built manylinux wheels; no C compiler needed.
+
+# --- Web framework ---
+fastapi==0.115.12
+uvicorn[standard]==0.34.3
+pydantic==2.11.5
+
+# --- Machine learning ---
+# IMPORTANT: both model artifacts were saved with xgboost 3.4.1.
+# Do NOT downgrade below 3.x — older versions cannot load these model files.
+xgboost==3.4.1
+scikit-learn==1.6.1
+numpy==1.26.4
+pandas==2.2.3
+joblib==1.4.2
+
+# --- Authentication ---
+pymongo==4.12.1
+dnspython==2.7.0
+PyJWT==2.10.1
+argon2-cffi==23.1.0
+
+# --- Supabase / HTTP ---
+supabase==2.15.3
+httpx==0.28.1
+
+# --- AI chatbot ---
+groq==0.26.0
+
+# --- Utilities ---
+python-dotenv==1.1.0
